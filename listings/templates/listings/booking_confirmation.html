@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Booking Confirmation - HomeStay{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-8 text-center">
+            <div class="bg-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-check text-4xl text-green-600"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-white mb-2">Booking Confirmed!</h1>
+            <p class="text-green-50">Your reservation has been successfully created</p>
+        </div>
+        <div class="p-8">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ booking.listing.title }}</h2>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase font-semibold mb-1">Check-in</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ booking.check_in|date:"F d, Y" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase font-semibold mb-1">Check-out</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ booking.check_out|date:"F d, Y" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase font-semibold mb-1">Guests</p>
+                        <p class="text-lg font-semibold text-gray-900">
+                            {{ booking.num_guests }} guest{% if booking.num_guests > 1 %}s{% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase font-semibold mb-1">Nights</p>
+                        <p class="text-lg font-semibold text-gray-900">
+                            {{ num_nights }} night{% if num_nights > 1 %}s{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-6 mb-8">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-600">${{ booking.listing.price_per_night }} x {{ num_nights }} nights</span>
+                    <span class="text-gray-900 font-semibold">${{ booking.total_price }}</span>
+                </div>
+                <div class="flex justify-between items-center text-xl font-bold mt-4 pt-4 border-t border-gray-200">
+                    <span>Total</span>
+                    <span class="text-green-600">${{ booking.total_price }}</span>
+                </div>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div class="flex items-start gap-3">
+                    <i class="fa-solid fa-info-circle text-blue-600 mt-1"></i>
+                    <div>
+                        <p class="text-sm text-blue-900 font-semibold mb-1">What's next?</p>
+                        <p class="text-sm text-blue-800">The host will review your booking request. You'll receive a
+                            confirmation email once approved.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <a href="{% url 'home' %}"
+                    class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition text-center">
+                    <i class="fa-solid fa-home mr-2"></i>Back to Home
+                </a>
+                <a href="{% url 'listing_detail' booking.listing.id %}"
+                    class="flex-1 bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold py-3 rounded-lg hover:opacity-90 transition text-center">
+                    <i class="fa-solid fa-eye mr-2"></i>View Listing
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

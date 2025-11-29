@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --brand-primary: #FF385C;
+    --brand-secondary: #E31C5F;
+    /* Slightly darker for gradients/hover */
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --bg-body: #f8fafc;
+    --bg-card: #ffffff;
+    --border-subtle: #e2e8f0;
+    --shadow-soft: 0 6px 16px rgba(0, 0, 0, 0.08);
+    --radius-card: 12px;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    line-height: 1.6 !important;
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+}
+
+/* Navbar Overrides */
+nav {
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    border-bottom: none !important;
+}
+
+/* Card Design */
+.listing-card {
+    border: none !important;
+    border-radius: var(--radius-card) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    background-color: var(--bg-card);
+    overflow: hidden;
+    /* Ensure content respects border radius */
+}
+
+.listing-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: var(--shadow-soft) !important;
+}
+
+.listing-card img {
+    border-radius: var(--radius-card) !important;
+}
+
+/* Guest Favorite Badge */
+.listing-card .absolute.top-3.left-3 {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styling */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    padding: 12px 16px !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 3px rgba(255, 56, 92, 0.15) !important;
+    /* Brand color ring */
+}
+
+/* Button Overrides */
+.bg-brand-primary {
+    background-color: var(--brand-primary) !important;
+}
+
+.text-brand-primary {
+    color: var(--brand-primary) !important;
+}
+
+.focus\:ring-brand-primary:focus {
+    --tw-ring-color: var(--brand-primary) !important;
+}
+
+/* Gradient buttons update */
+.bg-gradient-to-r.from-brand-primary {
+    background-image: linear-gradient(to right, var(--brand-primary), var(--brand-secondary)) !important;
+}
+
+.bg-gradient-to-br.from-brand-primary {
+    background-image: linear-gradient(to bottom right, var(--brand-primary), var(--brand-secondary)) !important;
+}

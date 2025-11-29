@@ -1,0 +1,4 @@
+Django
+stripe
+pillow
+python-dotenv

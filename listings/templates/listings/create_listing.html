@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}List Your Home - HomeStay{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">List your home on HomeStay</h1>
+        <p class="text-gray-600">Fill in the details below to create your listing</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Title -->
+        <div>
+            <label for="title" class="block text-sm font-semibold text-gray-900 mb-2">
+                Title <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="title" name="title" required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent"
+                placeholder="e.g., Cozy Beachfront Villa">
+        </div>
+
+        <!-- Price -->
+        <div>
+            <label for="price_per_night" class="block text-sm font-semibold text-gray-900 mb-2">
+                Price per night (USD) <span class="text-red-500">*</span>
+            </label>
+            <input type="number" id="price_per_night" name="price_per_night" required min="1" step="0.01"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent"
+                placeholder="100">
+        </div>
+
+        <!-- Room Type -->
+        <div>
+            <label for="room_type" class="block text-sm font-semibold text-gray-900 mb-2">
+                Room Type <span class="text-red-500">*</span>
+            </label>
+            <select id="room_type" name="room_type" required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent bg-white">
+                <option value="">Select room type</option>
+                <option value="entire_place">Entire Place</option>
+                <option value="private_room">Private Room</option>
+                <option value="shared_room">Shared Room</option>
+            </select>
+        </div>
+
+        <!-- Country -->
+        <div>
+            <label for="country" class="block text-sm font-semibold text-gray-900 mb-2">
+                Country <span class="text-red-500">*</span>
+            </label>
+            <select id="country" name="country" required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent bg-white">
+                <option value="">Select Country</option>
+            </select>
+        </div>
+
+        <!-- City -->
+        <div>
+            <label for="city" class="block text-sm font-semibold text-gray-900 mb-2">
+                City <span class="text-red-500">*</span>
+            </label>
+            <select id="city" name="city" required disabled
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent bg-white disabled:bg-gray-100 disabled:text-gray-400">
+                <option value="">Select Country First</option>
+            </select>
+        </div>
+
+        <!-- Category -->
+        <div>
+            <label for="category" class="block text-sm font-semibold text-gray-900 mb-2">
+                Category <span class="text-red-500">*</span>
+            </label>
+            <select id="category" name="category" required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent bg-white">
+                <option value="">Select category</option>
+                <option value="beach">Beach</option>
+                <option value="cabins">Cabins</option>
+                <option value="lakefront">Lakefront</option>
+                <option value="views">Views</option>
+                <option value="castles">Castles</option>
+            </select>
+        </div>
+
+        <!-- Description -->
+        <div>
+            <label for="description" class="block text-sm font-semibold text-gray-900 mb-2">
+                Description
+                <textarea id="description" name="description" rows="4"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent"
+                    placeholder="Describe your property, amenities, nearby attractions, etc."></textarea>
+                <p class="mt-2 text-sm text-gray-500">Help guests understand what makes your place special</p>
+        </div>
+
+        <!-- Available From (Check-in) -->
+        <div>
+            <label for="available_from" class="block text-sm font-semibold text-gray-900 mb-2">
+                Available From
+            </label>
+            <input type="date" id="available_from" name="available_from"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent">
+            <p class="mt-2 text-sm text-gray-500">Leave blank if available immediately</p>
+        </div>
+
+        <!-- Available Until (Check-out) -->
+        <div>
+            <label for="available_until" class="block text-sm font-semibold text-gray-900 mb-2">
+                Available Until
+            </label>
+            <input type="date" id="available_until" name="available_until"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent">
+            <p class="mt-2 text-sm text-gray-500">Leave blank for ongoing availability</p>
+        </div>
+
+        <!-- Map Location -->
+        <div>
+            <label class="block text-sm font-semibold text-gray-900 mb-2">Location <span
+                    class="text-red-500">*</span></label>
+
+            <!-- Search Box -->
+            <div class="mb-3 relative">
+                <input type="text" id="location-search"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent pr-12"
+                    placeholder="Search for a location (e.g., Eiffel Tower, Paris)">
+                <button type="button" id="search-btn"
+                    class="absolute right-2 top-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md p-2 transition">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+            </div>
+
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+            <div id="map" class="h-96 w-full rounded-lg border border-gray-300 z-0" style="height: 400px;"></div>
+            <p class="mt-2 text-sm text-gray-500">Click on the map to set the location of your property.</p>
+
+            <input type="hidden" id="latitude" name="latitude" required>
+            <input type="hidden" id="longitude" name="longitude" required>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Initialize Map
+                    var map = L.map('map').setView([20, 0], 2); // Default world view
+                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
+
+                    var marker;
+
+                    function updateMarker(lat, lng) {
+                        if (marker) {
+                            marker.setLatLng([lat, lng]);
+                        } else {
+                            marker = L.marker([lat, lng]).addTo(map);
+                        }
+                        map.setView([lat, lng], 13);
+                        document.getElementById('latitude').value = lat;
+                        document.getElementById('longitude').value = lng;
+                    }
+
+                    map.on('click', function (e) {
+                        updateMarker(e.latlng.lat, e.latlng.lng);
+                    });
+
+                    // Search Functionality
+                    const searchInput = document.getElementById('location-search');
+                    const searchBtn = document.getElementById('search-btn');
+
+                    function searchLocation() {
+                        const query = searchInput.value;
+                        if (query) {
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data && data.length > 0) {
+                                        const lat = parseFloat(data[0].lat);
+                                        const lon = parseFloat(data[0].lon);
+                                        updateMarker(lat, lon);
+                                    } else {
+                                        alert('Location not found');
+                                    }
+                                })
+                                .catch(error => console.error('Error searching location:', error));
+                        }
+                    }
+
+                    searchBtn.addEventListener('click', searchLocation);
+                    searchInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            searchLocation();
+                        }
+                    });
+
+                    const countrySelect = document.getElementById('country');
+                    const citySelect = document.getElementById('city');
+                    let countryData = {};
+
+                    // Fetch Country and City Data from local static file
+                    fetch("{% static 'listings/js/countries.json' %}")
+                        .then(response => response.json())
+                        .then(data => {
+                            countryData = data;
+                            // Populate Country Dropdown
+                            const countries = Object.keys(data).sort();
+                            countries.forEach(country => {
+                                const option = document.createElement('option');
+                                option.value = country;
+                                option.textContent = country;
+                                countrySelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error loading country data:', error);
+                            // Fallback to hardcoded countries if local fetch fails
+                            const fallbackCountries = ["United States", "United Kingdom", "Canada", "Australia", "France", "Germany", "Spain", "Italy", "Japan", "China", "India", "Brazil"];
+                            fallbackCountries.forEach(country => {
+                                const option = document.createElement('option');
+                                option.value = country;
+                                option.textContent = country;
+                                countrySelect.appendChild(option);
+                            });
+                        });
+
+                    // Handle Country Change
+                    countrySelect.addEventListener('change', function () {
+                        const selectedCountry = this.value;
+                        citySelect.innerHTML = '<option value="">Select City</option>';
+                        citySelect.disabled = true;
+
+                        if (selectedCountry && countryData[selectedCountry]) {
+                            const cities = countryData[selectedCountry].sort();
+                            cities.forEach(city => {
+                                const option = document.createElement('option');
+                                option.value = city;
+                                option.textContent = city;
+                                citySelect.appendChild(option);
+                            });
+                            citySelect.disabled = false;
+                        }
+                    });
+
+                    // Handle City Change
+                    citySelect.addEventListener('change', function () {
+                        const city = this.value;
+                        const country = countrySelect.value;
+
+                        if (city && country) {
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city + ', ' + country)}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data && data.length > 0) {
+                                        const lat = parseFloat(data[0].lat);
+                                        const lon = parseFloat(data[0].lon);
+                                        updateMarker(lat, lon);
+                                    }
+                                })
+                                .catch(error => console.error('Error geocoding location:', error));
+                        }
+                    });
+                });
+            </script>
+        </div>
+
+        <!-- Image -->
+        <div>
+            <label for="image" class="block text-sm font-semibold text-gray-900 mb-2">
+                Property Image <span class="text-red-500">*</span>
+            </label>
+            <input type="file" id="image" name="image" accept="image/*" required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-brand-red hover:file:bg-red-100">
+            <p class="mt-2 text-sm text-gray-500">Upload a high-quality image of your property</p>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-4">
+            <button type="submit"
+                class="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold py-4 rounded-lg hover:opacity-90 transition text-lg">
+                <i class="fa-solid fa-check mr-2"></i>
+                Create Listing
+            </button>
+        </div>
+    </form>
+
+    {% if messages %}
+    <div class="mt-6">
+        {% for message in messages %}
+        <div
+            class="{% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% else %}bg-red-50 border-red-200 text-red-800{% endif %} border px-4 py-3 rounded-lg">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

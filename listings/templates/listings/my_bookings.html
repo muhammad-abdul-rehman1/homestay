@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings - HomeStay{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">My Bookings</h1>
+
+    {% if bookings %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for booking in bookings %}
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition overflow-hidden">
+            <div class="relative h-48">
+                {% if booking.listing.image %}
+                <img src="{{ booking.listing.image.url }}" alt="{{ booking.listing.title }}"
+                    class="w-full h-full object-cover">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+                    alt="Placeholder" class="w-full h-full object-cover">
+                {% endif %}
+                <div class="absolute top-3 right-3 bg-white px-2 py-1 rounded-md text-xs font-bold shadow-sm">
+                    {{ booking.listing.category|title }}
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="text-lg font-bold text-gray-900 mb-1 truncate">{{ booking.listing.title }}</h3>
+                <p class="text-gray-500 text-sm mb-3">{{ booking.listing.country }}</p>
+
+                <div class="border-t border-gray-100 pt-3 space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Check-in</span>
+                        <span class="font-semibold text-gray-900">{{ booking.check_in|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Check-out</span>
+                        <span class="font-semibold text-gray-900">{{ booking.check_out|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Total Price</span>
+                        <span class="font-bold text-green-600">${{ booking.total_price }}</span>
+                    </div>
+                </div>
+
+                <a href="{% url 'listing_detail' booking.listing.id %}"
+                    class="block w-full mt-4 bg-gray-100 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-200 transition text-center text-sm">
+                    View Listing
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
+        <div class="bg-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <i class="fa-solid fa-suitcase text-2xl text-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
+        <p class="text-gray-500 mb-6">Time to dust off your bags and start planning your next adventure</p>
+        <a href="{% url 'home' %}"
+            class="inline-block bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold py-3 px-8 rounded-full hover:opacity-90 transition shadow-lg shadow-brand-primary/30">
+            Start Exploring
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

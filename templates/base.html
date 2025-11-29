@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HomeStay - Find your next stay{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/modern_theme.css' %}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#FF385C', // Coral
+                            secondary: '#E31C5F', // Darker Coral
+                            hover: '#D11A50'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="font-sans text-gray-700 antialiased bg-gray-50">
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md border-b border-gray-100 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center cursor-pointer">
+                    <a href="{% url 'home' %}" class="flex items-center gap-2">
+                        <div class="flex-shrink-0">
+                            <img src="{% static 'images/logo.png' %}" alt="HomeStay Logo" class="h-10 w-auto">
+                        </div>
+                        <span class="text-gray-900 font-bold text-xl hidden md:block tracking-tight">HomeStay</span>
+                    </a>
+                </div>
+
+                <form action="{% url 'home' %}" method="GET"
+                    class="hidden md:flex bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-all duration-300 divide-x divide-gray-200">
+                    <input type="text" name="search" placeholder="Search destinations"
+                        value="{{ request.GET.search|default:'' }}"
+                        class="px-6 py-2.5 text-sm font-medium bg-transparent border-none focus:ring-0 rounded-l-full w-64 outline-none">
+                    <button type="submit"
+                        class="px-4 pr-5 flex items-center gap-3 hover:bg-gray-50 transition rounded-r-full">
+                        <div class="bg-brand-primary rounded-full p-2 text-white shadow-md">
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        </div>
+                    </button>
+                </form>
+
+                <div class="flex items-center gap-4">
+                    <a href="{% url 'become_host' %}"
+                        class="text-sm font-medium hover:bg-gray-100 px-4 py-2 rounded-full cursor-pointer transition">HomeStay
+                        your home</a>
+                    <div class="relative">
+                        <button id="userMenuButton" onclick="toggleUserMenu()"
+                            class="flex items-center border border-gray-200 rounded-full p-1 pl-3 gap-3 hover:shadow-md cursor-pointer transition bg-white">
+                            <i class="fa-solid fa-bars text-gray-500"></i>
+                            <div class="bg-gray-800 text-white rounded-full p-1">
+                                <i class="fa-solid fa-user text-sm px-1"></i>
+                            </div>
+                        </button>
+                        <div id="userMenuDropdown"
+                            class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 ring-1 ring-black ring-opacity-5">
+                            {% if user.is_authenticated %}
+                            <div class="px-4 py-2 text-sm font-semibold border-b border-gray-100 text-brand-primary">
+                                Hello, {{ user.username }}!</div>
+                            <a href="{% url 'my_listings' %}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-50 transition">My
+                                Listings</a>
+                            <a href="{% url 'my_bookings' %}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-50 transition">My
+                                Bookings</a>
+                            <a href="{% url 'profile' %}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-50 transition">Profile</a>
+                            <hr class="my-2 border-gray-100">
+                            <a href="{% url 'become_host' %}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-50 transition">Host
+                                your home</a>
+                            <hr class="my-2 border-gray-100">
+                            <a href="{% url 'logout' %}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-50 transition text-red-600">Logout</a>
+                            {% else %}
+                            <a href="#" onclick="showLoginModal(); return false;"
+                                class="block px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition">Log in</a>
+                            <a href="#" onclick="showSignupModal(); return false;"
+                                class="block px-4 py-2 text-sm hover:bg-gray-50 transition">Sign up</a>
+                            <hr class="my-2 border-gray-100">
+                            <a href="{% url 'become_host' %}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-50 transition">HomeStay
+                                your home</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="pt-24 pb-12">
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            {% for message in messages %}
+            <div
+                class="{% if message.tags == 'success' %}bg-teal-50 border-teal-200 text-teal-800{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %} border px-4 py-3 rounded-xl mb-4 shadow-sm flex items-center gap-2">
+                <i
+                    class="fa-solid {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+    <div
+        class="md:hidden fixed bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-gray-200 py-3 px-6 z-50 flex justify-between items-center text-gray-500 text-xs">
+        <div class="flex flex-col items-center text-brand-primary"><i
+                class="fa-solid fa-magnifying-glass text-xl mb-1"></i><span>Explore</span></div>
+        <div class="flex flex-col items-center hover:text-brand-primary transition"><i
+                class="fa-regular fa-heart text-xl mb-1"></i><span>Wishlists</span>
+        </div>
+        <div class="flex flex-col items-center hover:text-brand-primary transition"><i
+                class="fa-solid fa-earth-americas text-xl mb-1"></i><span>Trips</span></div>
+        <div class="flex flex-col items-center hover:text-brand-primary transition"><i
+                class="fa-regular fa-message text-xl mb-1"></i><span>Inbox</span>
+        </div>
+        <div class="flex flex-col items-center hover:text-brand-primary transition"><i
+                class="fa-regular fa-circle-user text-xl mb-1"></i><span>Profile</span></div>
+    </div>
+    <div id="loginModal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Welcome back</h2>
+                <button onclick="closeLoginModal()" class="text-gray-400 hover:text-gray-600 transition"><i
+                        class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div id="loginError"
+                class="hidden bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-exclamation-circle"></i><span id="loginErrorMessage"></span>
+            </div>
+            <form id="loginForm" method="POST" action="{% url 'login' %}" class="space-y-4">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Email" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition">
+                <input type="password" name="password" placeholder="Password" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition">
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold py-3 rounded-xl hover:opacity-90 transition shadow-lg shadow-brand-primary/30">Log
+                    in</button>
+            </form>
+            <p class="text-center mt-6 text-sm text-gray-600">Don't have an account? <a href="#"
+                    onclick="showSignupModal(); closeLoginModal(); return false;"
+                    class="text-brand-primary font-bold hover:underline">Sign up</a></p>
+        </div>
+    </div>
+    <div id="signupModal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Create an account</h2>
+                <button onclick="closeSignupModal()" class="text-gray-400 hover:text-gray-600 transition"><i
+                        class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div id="signupError"
+                class="hidden bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-exclamation-circle"></i><span id="signupErrorMessage"></span>
+            </div>
+            <form id="signupForm" method="POST" action="{% url 'signup' %}" class="space-y-4">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="Full Name" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition">
+                <input type="email" name="email" placeholder="Email" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition">
+                <input type="password" name="password" placeholder="Password" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition">
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold py-3 rounded-xl hover:opacity-90 transition shadow-lg shadow-brand-primary/30">Sign
+                    up</button>
+            </form>
+            <p class="text-center mt-6 text-sm text-gray-600">Already have an account? <a href="#"
+                    onclick="showLoginModal(); closeSignupModal(); return false;"
+                    class="text-brand-primary font-bold hover:underline">Log in</a></p>
+        </div>
+    </div>
+    <script>
+        function toggleUserMenu() { const dropdown = document.getElementById('userMenuDropdown'); dropdown.classList.toggle('hidden'); }
+        document.addEventListener('click', function (event) { const button = document.getElementById('userMenuButton'); const dropdown = document.getElementById('userMenuDropdown'); if (button && dropdown && !button.contains(event.target) && !dropdown.contains(event.target)) { dropdown.classList.add('hidden'); } });
+        function showLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); document.getElementById('userMenuDropdown').classList.add('hidden'); document.getElementById('loginError').classList.add('hidden'); document.getElementById('loginForm').reset(); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
+        function showSignupModal() { document.getElementById('signupModal').classList.remove('hidden'); document.getElementById('userMenuDropdown').classList.add('hidden'); document.getElementById('signupError').classList.add('hidden'); document.getElementById('signupForm').reset(); }
+        function closeSignupModal() { document.getElementById('signupModal').classList.add('hidden'); }
+        document.getElementById('loginModal')?.addEventListener('click', function (e) { if (e.target === this) closeLoginModal(); });
+        document.getElementById('signupModal')?.addEventListener('click', function (e) { if (e.target === this) closeSignupModal(); });
+        document.getElementById('loginForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        document.getElementById('loginErrorMessage').textContent = data.error || 'An error occurred.';
+                        document.getElementById('loginError').classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loginErrorMessage').textContent = 'An error occurred. Please try again.';
+                    document.getElementById('loginError').classList.remove('hidden');
+                });
+        });
+
+        document.getElementById('signupForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        document.getElementById('signupErrorMessage').textContent = data.error || 'An error occurred.';
+                        document.getElementById('signupError').classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('signupErrorMessage').textContent = 'An error occurred. Please try again.';
+                    document.getElementById('signupError').classList.remove('hidden');
+                });
+        });
+    </script>
+</body>
+
+</html>

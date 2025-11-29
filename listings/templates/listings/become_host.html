@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Become a Host - HomeStay{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">HomeStay your home</h1>
+        <p class="text-xl text-gray-600">Earn extra income and unlock new opportunities by sharing your space.</p>
+    </div>
+
+    <!-- Benefits Grid -->
+    <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="text-center">
+            <div class="bg-red-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-dollar-sign text-brand-red text-2xl"></i>
+            </div>
+            <h3 class="font-semibold text-lg mb-2">Earn money</h3>
+            <p class="text-gray-600 text-sm">Share your extra space and make money on your own schedule.</p>
+        </div>
+        <div class="text-center">
+            <div class="bg-red-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-shield-halved text-brand-red text-2xl"></i>
+            </div>
+            <h3 class="font-semibold text-lg mb-2">It's free to get started</h3>
+            <p class="text-gray-600 text-sm">List your space for free and only pay when you have a booking.</p>
+        </div>
+        <div class="text-center">
+            <div class="bg-red-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-users text-brand-red text-2xl"></i>
+            </div>
+            <h3 class="font-semibold text-lg mb-2">We're here to help</h3>
+            <p class="text-gray-600 text-sm">Get 24/7 support and connect with experienced hosts.</p>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-8 text-center mb-16">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Ready to get started?</h2>
+        <p class="text-gray-600 mb-6">Tell us about your place and start welcoming guests.</p>
+        <a href="{% url 'create_listing' %}"
+            class="bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold py-4 px-8 rounded-lg hover:opacity-90 transition text-lg inline-block">
+            Start hosting
+        </a>
+    </div>
+
+    <!-- How it works -->
+    <div>
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">How it works</h2>
+        <div class="space-y-6">
+            <div class="flex gap-6 items-start">
+                <div
+                    class="bg-brand-red text-white rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 font-bold">
+                    1
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">Tell us about your place</h3>
+                    <p class="text-gray-600">Share some basic info, like where it is and how many guests can stay.</p>
+                </div>
+            </div>
+            <div class="flex gap-6 items-start">
+                <div
+                    class="bg-brand-red text-white rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 font-bold">
+                    2
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">Make it stand out</h3>
+                    <p class="text-gray-600">Add photos, a title, and description to help your listing shine.</p>
+                </div>
+            </div>
+            <div class="flex gap-6 items-start">
+                <div
+                    class="bg-brand-red text-white rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 font-bold">
+                    3
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">Finish up and publish</h3>
+                    <p class="text-gray-600">Set your price, confirm a few details, and publish your listing.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

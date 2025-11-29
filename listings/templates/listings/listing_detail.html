@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block title %}{{ listing.title }} - HomeStay{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ listing.title }}</h1>
+        <div class="flex justify-between items-center text-sm text-gray-600">
+            <div class="flex items-center gap-2">
+                <span class="flex items-center gap-1 font-semibold text-gray-900"><i
+                        class="fa-solid fa-star text-xs"></i>
+                    {% if listing.reviews.count > 0 %}
+                    {{ listing.average_rating|floatformat:2 }}
+                    {% else %}
+                    New
+                    {% endif %}</span>
+                <span>&middot;</span>
+                <span class="underline font-semibold text-gray-900">{{ listing.reviews.count }} reviews</span>
+                <span>&middot;</span>
+                <span class="underline text-gray-900">{{ listing.country }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-12">
+        <div class="w-full h-[400px] rounded-xl overflow-hidden">
+            {% if listing.image %}<img src="{{ listing.image.url }}" alt="{{ listing.title }}"
+                class="object-cover w-full h-full">{% else %}<img
+                src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+                alt="Placeholder" class="object-cover w-full h-full">{% endif %}
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div class="md:col-span-2">
+            <div class="border-b border-gray-200 pb-6 mb-6">
+                <h2 class="text-2xl font-semibold mb-1">{{ room_type_display }} hosted by {{ host_display_name }}</h2>
+                <p class="text-gray-600">{{ listing.category|title }} &middot; {{ listing.country }}</p>
+            </div>
+            {% if listing.description %}
+            <div class="border-b border-gray-200 pb-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4">About this place</h3>
+                <p class="text-gray-800 leading-relaxed whitespace-pre-line">{{ listing.description }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Map Section -->
+            {% if listing.latitude and listing.longitude %}
+            <div class="border-b border-gray-200 pb-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4">Where you'll be</h3>
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+                <div id="map" class="h-96 w-full rounded-xl z-0"></div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var map = L.map('map').setView([{{ listing.latitude }}, {{ listing.longitude }}], 13);
+                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
+                    L.marker([{{ listing.latitude }}, {{ listing.longitude }}]).addTo(map);
+                    });
+                </script>
+            </div>
+            {% endif %}
+
+            <!-- Reviews Section -->
+            <div class="border-b border-gray-200 pb-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4">
+                    <i class="fa-solid fa-star text-sm text-black mr-1"></i>
+                    {{ listing.average_rating|floatformat:2 }} &middot; {{ listing.reviews.count }} reviews
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    {% for review in listing.reviews.all %}
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div
+                                class="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center font-bold text-gray-600">
+                                {{ review.user.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">{{ review.user.username }}</h4>
+                                <p class="text-sm text-gray-500">{{ review.created_at|date:"F Y" }}</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700">{{ review.comment }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-500 col-span-2">No reviews yet.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Add Review Form -->
+                {% if user.is_authenticated and user != listing.host %}
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h4 class="font-semibold text-lg mb-4">Leave a Review</h4>
+                    <form method="POST" action="{% url 'add_review' listing.id %}">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-900 mb-2">Rating</label>
+                            <div class="flex gap-4">
+                                <label class="cursor-pointer"><input type="radio" name="rating" value="1" required
+                                        class="mr-1"> 1</label>
+                                <label class="cursor-pointer"><input type="radio" name="rating" value="2" required
+                                        class="mr-1"> 2</label>
+                                <label class="cursor-pointer"><input type="radio" name="rating" value="3" required
+                                        class="mr-1"> 3</label>
+                                <label class="cursor-pointer"><input type="radio" name="rating" value="4" required
+                                        class="mr-1"> 4</label>
+                                <label class="cursor-pointer"><input type="radio" name="rating" value="5" required
+                                        class="mr-1"> 5</label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-900 mb-2">Comment</label>
+                            <textarea name="comment" rows="3" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"></textarea>
+                        </div>
+                        <button type="submit"
+                            class="bg-black text-white font-bold py-2 px-6 rounded-lg hover:opacity-80 transition">
+                            Submit Review
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="md:col-span-1 relative">
+            <div class="sticky top-24">
+                {% if user.is_authenticated and user == listing.host %}
+                <div class="border border-gray-200 rounded-xl shadow-xl p-6 bg-white">
+                    <div class="text-center mb-6">
+                        <div class="bg-blue-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-house-user text-3xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Your Listing</h3>
+                        <p class="text-gray-600 text-sm">Manage your property settings</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600 text-sm">Total Bookings</span>
+                            <span class="text-2xl font-bold text-gray-900">{{ listing.booking_set.count }}</span>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="{% url 'edit_listing' listing.id %}"
+                            class="block w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-3 rounded-lg hover:opacity-90 transition text-center"><i
+                                class="fa-solid fa-pen mr-2"></i>Edit Listing</a>
+                        <a href="{% url 'delete_listing' listing.id %}"
+                            class="block w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition text-center"><i
+                                class="fa-solid fa-trash mr-2"></i>Delete Listing</a>
+                        <a href="{% url 'my_listings' %}"
+                            class="block w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition text-center"><i
+                                class="fa-solid fa-arrow-left mr-2"></i>Back to My Listings</a>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <p class="text-xs text-gray-500 text-center"><i class="fa-solid fa-info-circle mr-1"></i>You
+                            cannot book your own listing</p>
+                    </div>
+                </div>
+                {% else %}
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'checkout' listing.id %}">
+                    {% csrf_token %}
+                    <div class="border border-gray-200 rounded-xl shadow-xl p-6 bg-white">
+                        <div class="flex justify-between items-baseline mb-4">
+                            <span class="text-2xl font-bold text-gray-900">${{ listing.price_per_night }}</span>
+                            <span class="text-gray-600">night</span>
+                        </div>
+                        <div class="border border-gray-400 rounded-lg mb-4">
+                            <div class="flex border-b border-gray-400">
+                                <div class="w-1/2 p-3 border-r border-gray-400">
+                                    <label class="block text-xs font-bold text-gray-800 uppercase">Check-in</label>
+                                    <input type="date" name="check_in" required
+                                        class="w-full text-sm outline-none text-gray-600 cursor-pointer bg-transparent">
+                                </div>
+                                <div class="w-1/2 p-3">
+                                    <label class="block text-xs font-bold text-gray-800 uppercase">Check-out</label>
+                                    <input type="date" name="check_out" required
+                                        class="w-full text-sm outline-none text-gray-600 cursor-pointer bg-transparent">
+                                </div>
+                            </div>
+                            <div class="p-3">
+                                <label class="block text-xs font-bold text-gray-800 uppercase">Guests</label>
+                                <select name="num_guests" required
+                                    class="w-full text-sm outline-none text-gray-600 bg-white cursor-pointer">
+                                    <option value="1">1 guest</option>
+                                    <option value="2">2 guests</option>
+                                    <option value="3">3 guests</option>
+                                    <option value="4">4 guests</option>
+                                    <option value="5">5 guests</option>
+                                    <option value="6">6 guests</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold py-4 rounded-lg hover:opacity-90 transition shadow-lg shadow-brand-primary/30">
+                            Reserve
+                        </button>
+                        <p class="text-center text-gray-500 text-sm mt-4">You won't be charged yet</p>
+                    </div>
+                </form>
+                {% else %}
+                <div class="border border-gray-200 rounded-xl shadow-xl p-6 bg-white">
+                    <div class="flex justify-between items-baseline mb-4">
+                        <span class="text-2xl font-bold text-gray-900">${{ listing.price_per_night }}</span>
+                        <span class="text-gray-600">night</span>
+                    </div>
+                    <a href="{% url 'login' %}"
+                        class="block w-full bg-brand-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition text-center">
+                        Login to Book
+                    </a>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

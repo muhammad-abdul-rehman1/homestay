@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Listing - HomeStay{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Listing</h1>
+        <p class="text-gray-600">Update your property details</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <div>
+            <label for="title" class="block text-sm font-semibold text-gray-900 mb-2">
+                Title <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="title" name="title" required value="{{ listing.title }}"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent">
+        </div>
+
+        <div>
+            <label for="price_per_night" class="block text-sm font-semibold text-gray-900 mb-2">
+                Price per night (USD) <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+                <span class="absolute left-4 top-3 text-gray-500">$</span>
+                <input type="number" id="price_per_night" name="price_per_night" required min="1" step="0.01"
+                    value="{{ listing.price_per_night }}"
+                    class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent">
+            </div>
+        </div>
+
+        <div>
+            <label for="room_type" class="block text-sm font-semibold text-gray-900 mb-2">
+                Room Type <span class="text-red-500">*</span>
+            </label>
+            <select id="room_type" name="room_type" required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent bg-white">
+                <option value="entire_place">Entire Place</option>
+                <option value="private_room">Private Room</option>
+                <option value="shared_room">Shared Room</option>
+            </select>
+            <script>document.getElementById('room_type').value = "{{ listing.room_type }}";</script>
+        </div>
+
+        <!-- Country -->
+        <div>
+            <label for="country" class="block text-sm font-semibold text-gray-900 mb-2">
+                Country <span class="text-red-500">*</span>
+            </label>
+            <select id="country" name="country" required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent bg-white">
+                <option value="">Select Country</option>
+            </select>
+        </div>
+
+        <!-- City -->
+        <div>
+            <label for="city" class="block text-sm font-semibold text-gray-900 mb-2">
+                City <span class="text-red-500">*</span>
+            </label>
+            <select id="city" name="city" required disabled
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent bg-white disabled:bg-gray-100 disabled:text-gray-400">
+                <option value="">Select Country First</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="category" class="block text-sm font-semibold text-gray-900 mb-2">
+                Category <span class="text-red-500">*</span>
+            </label>
+            <select id="category" name="category" required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent bg-white">
+                <option value="beach">Beach</option>
+                <option value="cabins">Cabins</option>
+                <option value="lakefront">Lakefront</option>
+                <option value="views">Views</option>
+                <option value="castles">Castles</option>
+            </select>
+            <script>document.getElementById('category').value = "{{ listing.category }}";</script>
+        </div>
+
+        <div>
+            <label for="description" class="block text-sm font-semibold text-gray-900 mb-2">
+                Description
+            </label>
+            <textarea id="description" name="description" rows="4"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent">{{ listing.description }}</textarea>
+        </div>
+
+        <div>
+            <label for="available_from" class="block text-sm font-semibold text-gray-900 mb-2">
+                Available From
+            </label>
+            <input type="date" id="available_from" name="available_from"
+                value="{% if listing.available_from %}{{ listing.available_from|date:'Y-m-d' }}{% endif %}"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent">
+        </div>
+
+        <div>
+            <label for="available_until" class="block text-sm font-semibold text-gray-900 mb-2">
+                Available Until
+            </label>
+            <input type="date" id="available_until" name="available_until"
+                value="{% if listing.available_until %}{{ listing.available_until|date:'Y-m-d' }}{% endif %}"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent">
+        </div>
+
+        <!-- Map Location -->
+        <div>
+            <label class="block text-sm font-semibold text-gray-900 mb-2">Location <span
+                    class="text-red-500">*</span></label>
+
+            <!-- Search Box -->
+            <div class="mb-3 relative">
+                <input type="text" id="location-search"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent pr-12"
+                    placeholder="Search for a location (e.g., Eiffel Tower, Paris)">
+                <button type="button" id="search-btn"
+                    class="absolute right-2 top-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md p-2 transition">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+            </div>
+
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+            <div id="map" class="h-96 w-full rounded-lg border border-gray-300 z-0" style="height: 400px;"></div>
+            <p class="mt-2 text-sm text-gray-500">Click on the map to update the location.</p>
+
+            <input type="hidden" id="latitude" name="latitude" value="{{ listing.latitude|default:'' }}">
+            <input type="hidden" id="longitude" name="longitude" value="{{ listing.longitude|default:'' }}">
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Fixed template syntax with parseFloat protection
+                    var initialLat = parseFloat("{{ listing.latitude|default:34.0522 }}");
+                    var initialLng = parseFloat("{{ listing.longitude|default:-118.2437 }}");
+                    var map = L.map('map').setView([initialLat, initialLng], 13);
+
+                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
+
+                    var marker;
+                    {% if listing.latitude and listing.longitude %}
+                    marker = L.marker([initialLat, initialLng]).addTo(map);
+                    {% endif %}
+
+                    function updateMarker(lat, lng) {
+                        if (marker) {
+                            marker.setLatLng([lat, lng]);
+                        } else {
+                            marker = L.marker([lat, lng]).addTo(map);
+                        }
+                        map.setView([lat, lng], 13);
+                        document.getElementById('latitude').value = lat;
+                        document.getElementById('longitude').value = lng;
+                    }
+
+                    map.on('click', function (e) {
+                        updateMarker(e.latlng.lat, e.latlng.lng);
+                    });
+
+                    // Search Functionality
+                    const searchInput = document.getElementById('location-search');
+                    const searchBtn = document.getElementById('search-btn');
+
+                    function searchLocation() {
+                        const query = searchInput.value;
+                        if (query) {
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data && data.length > 0) {
+                                        const lat = parseFloat(data[0].lat);
+                                        const lon = parseFloat(data[0].lon);
+                                        updateMarker(lat, lon);
+                                    } else {
+                                        alert('Location not found');
+                                    }
+                                })
+                                .catch(error => console.error('Error searching location:', error));
+                        }
+                    }
+
+                    searchBtn.addEventListener('click', searchLocation);
+                    searchInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            searchLocation();
+                        }
+                    });
+
+                    const countrySelect = document.getElementById('country');
+                    const citySelect = document.getElementById('city');
+                    const currentCountry = "{{ listing.country }}";
+                    const currentCity = "{{ listing.city|default:'' }}";
+                    let countryData = {};
+
+                    // Fetch Country and City Data from local static file
+                    fetch("{% static 'listings/js/countries.json' %}")
+                        .then(response => response.json())
+                        .then(data => {
+                            countryData = data;
+                            // Populate Country Dropdown
+                            const countries = Object.keys(data).sort();
+                            countries.forEach(country => {
+                                const option = document.createElement('option');
+                                option.value = country;
+                                option.textContent = country;
+                                if (country === currentCountry) {
+                                    option.selected = true;
+                                }
+                                countrySelect.appendChild(option);
+                            });
+
+                            // If country is pre-selected, populate cities
+                            if (currentCountry && countryData[currentCountry]) {
+                                populateCities(currentCountry, currentCity);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading country data:', error);
+                            // Fallback to hardcoded countries if local fetch fails
+                            const fallbackCountries = ["United States", "United Kingdom", "Canada", "Australia", "France", "Germany", "Spain", "Italy", "Japan", "China", "India", "Brazil"];
+                            fallbackCountries.forEach(country => {
+                                const option = document.createElement('option');
+                                option.value = country;
+                                option.textContent = country;
+                                if (country === currentCountry) {
+                                    option.selected = true;
+                                }
+                                countrySelect.appendChild(option);
+                            });
+                        });
+
+                    function populateCities(country, selectedCity = null) {
+                        citySelect.innerHTML = '<option value="">Select City</option>';
+                        citySelect.disabled = true;
+
+                        if (countryData[country]) {
+                            const cities = countryData[country].sort();
+                            cities.forEach(city => {
+                                const option = document.createElement('option');
+                                option.value = city;
+                                option.textContent = city;
+                                if (selectedCity && city === selectedCity) {
+                                    option.selected = true;
+                                }
+                                citySelect.appendChild(option);
+                            });
+                            citySelect.disabled = false;
+                        }
+                    }
+
+                    // Handle Country Change
+                    countrySelect.addEventListener('change', function () {
+                        const selectedCountry = this.value;
+                        if (selectedCountry) {
+                            populateCities(selectedCountry);
+                        } else {
+                            citySelect.innerHTML = '<option value="">Select Country First</option>';
+                            citySelect.disabled = true;
+                        }
+                    });
+
+                    // Handle City Change
+                    citySelect.addEventListener('change', function () {
+                        const city = this.value;
+                        const country = countrySelect.value;
+
+                        if (city && country) {
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city + ', ' + country)}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data && data.length > 0) {
+                                        const lat = parseFloat(data[0].lat);
+                                        const lon = parseFloat(data[0].lon);
+                                        updateMarker(lat, lon);
+                                    }
+                                })
+                                .catch(error => console.error('Error geocoding location:', error));
+                        }
+                    });
+                });
+            </script>
+        </div>
+
+        <div>
+            <label for="image" class="block text-sm font-semibold text-gray-900 mb-2">
+                Property Image
+            </label>
+            {% if listing.image %}
+            <div class="mb-3">
+                <img src="{{ listing.image.url }}" alt="{{ listing.title }}" class="w-32 h-32 object-cover rounded-lg">
+                <p class="text-sm text-gray-500 mt-2">Current image (upload a new one to replace)</p>
+            </div>
+            {% endif %}
+            <input type="file" id="image" name="image" accept="image/*"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-brand-red hover:file:bg-red-100">
+        </div>
+
+        <div class="flex gap-4 pt-4">
+            <button type="submit"
+                class="flex-1 bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold py-4 rounded-lg hover:opacity-90 transition text-lg">
+                <i class="fa-solid fa-check mr-2"></i>
+                Save Changes
+            </button>
+            <a href="{% url 'my_listings' %}"
+                class="flex-1 bg-gray-200 text-gray-700 font-bold py-4 rounded-lg hover:bg-gray-300 transition text-lg text-center flex items-center justify-center">
+                <i class="fa-solid fa-times mr-2"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

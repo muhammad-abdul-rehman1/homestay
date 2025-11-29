@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Category Filter -->
+<div class="pt-4 pb-4 border-b sticky top-20 bg-white z-40">
+    <div class="max-w-7xl mx-auto px-4 flex gap-8 overflow-x-auto no-scrollbar">
+        <a href="?category=beach"
+            class="flex flex-col items-center gap-2 min-w-[64px] cursor-pointer {% if request.GET.category == 'beach' %}text-black border-b-2 border-black opacity-100{% else %}text-gray-500 hover:text-black hover:border-b-2 hover:border-gray-300 opacity-70 hover:opacity-100{% endif %} pb-2 transition">
+            <i class="fa-solid fa-umbrella-beach text-2xl"></i>
+            <span class="text-xs font-medium">Beach</span>
+        </a>
+        <a href="?category=cabins"
+            class="flex flex-col items-center gap-2 min-w-[64px] cursor-pointer {% if request.GET.category == 'cabins' %}text-black border-b-2 border-black opacity-100{% else %}text-gray-500 hover:text-black hover:border-b-2 hover:border-gray-300 opacity-70 hover:opacity-100{% endif %} pb-2 transition">
+            <i class="fa-solid fa-tree text-2xl"></i>
+            <span class="text-xs font-medium">Cabins</span>
+        </a>
+        <a href="?category=lakefront"
+            class="flex flex-col items-center gap-2 min-w-[64px] cursor-pointer {% if request.GET.category == 'lakefront' %}text-black border-b-2 border-black opacity-100{% else %}text-gray-500 hover:text-black hover:border-b-2 hover:border-gray-300 opacity-70 hover:opacity-100{% endif %} pb-2 transition">
+            <i class="fa-solid fa-water text-2xl"></i>
+            <span class="text-xs font-medium">Lakefront</span>
+        </a>
+        <a href="?category=views"
+            class="flex flex-col items-center gap-2 min-w-[64px] cursor-pointer {% if request.GET.category == 'views' %}text-black border-b-2 border-black opacity-100{% else %}text-gray-500 hover:text-black hover:border-b-2 hover:border-gray-300 opacity-70 hover:opacity-100{% endif %} pb-2 transition">
+            <i class="fa-solid fa-mountain-city text-2xl"></i>
+            <span class="text-xs font-medium">Views</span>
+        </a>
+        <a href="?category=castles"
+            class="flex flex-col items-center gap-2 min-w-[64px] cursor-pointer {% if request.GET.category == 'castles' %}text-black border-b-2 border-black opacity-100{% else %}text-gray-500 hover:text-black hover:border-b-2 hover:border-gray-300 opacity-70 hover:opacity-100{% endif %} pb-2 transition">
+            <i class="fa-brands fa-fort-awesome text-2xl"></i>
+            <span class="text-xs font-medium">Castles</span>
+        </a>
+    </div>
+</div>
+
+<!-- Main Listing Grid -->
+<main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for listing in listings %}
+        <a href="{% url 'listing_detail' listing.id %}" class="group cursor-pointer block listing-card">
+            <div class="relative aspect-square overflow-hidden rounded-xl bg-gray-200 mb-3">
+                {% if listing.image %}
+                <img src="{{ listing.image.url }}" alt="{{ listing.title }}"
+                    class="object-cover w-full h-full group-hover:scale-105 transition duration-300">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Placeholder" class="object-cover w-full h-full group-hover:scale-105 transition duration-300">
+                {% endif %}
+
+                {% if listing.average_rating >= 4.8 and listing.reviews.count > 0 %}
+                <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm z-10">
+                    <span class="text-xs font-bold text-gray-900">Guest favorite</span>
+                </div>
+                {% endif %}
+
+                <button class="absolute top-3 right-3 text-white/70 hover:scale-110 transition z-10">
+                    <i class="fa-solid fa-heart text-2xl drop-shadow-sm"></i>
+                </button>
+            </div>
+            <div class="flex justify-between items-start">
+                <h3 class="font-bold text-gray-900 text-base">{{ listing.title }}</h3>
+                <div class="flex items-center gap-1">
+                    <i class="fa-solid fa-star text-xs text-black"></i>
+                    <span class="text-sm font-light">
+                        {% if listing.average_rating > 0 %}
+                        {{ listing.average_rating|floatformat:2 }}
+                        {% else %}
+                        New
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="text-gray-500 text-sm mb-1">{{ listing.city }}, {{ listing.country }}</div>
+            <div class="mt-1 flex items-baseline gap-1">
+                <span class="font-semibold text-gray-900">${{ listing.price_per_night }}</span>
+                <span class="text-gray-900 font-light">night</span>
+            </div>
+        </a>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <p class="text-gray-500 text-lg">No listings found in this category.</p>
+            <a href="{% url 'home' %}" class="text-brand-red font-semibold hover:underline mt-2 block">View all
+                listings</a>
+        </div>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}
