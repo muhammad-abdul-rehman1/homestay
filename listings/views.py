@@ -1,57 +1,80 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Listing, User, Booking, Review
-from .forms import ListingForm, ReviewForm
+from .forms import ListingForm, ReviewForm, SignUpForm
 from datetime import datetime
 import stripe
 import json
 from django.http import JsonResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.safestring import mark_safe
+
+from .decorators import host_required
+
+# ... (existing imports)
 
 from django.db.models import Q
 
 def home(request):
-    query = request.GET.get('search')
-    category = request.GET.get('category')
-    
     listings = Listing.objects.all()
     
+    # Text Search (Location/Title)
+    query = request.GET.get('q')
     if query:
         listings = listings.filter(
             Q(title__icontains=query) | 
-            Q(city__icontains=query) |
+            Q(city__icontains=query) | 
             Q(country__icontains=query)
         )
-        
+    
+    # Filter by category
+    category = request.GET.get('category')
     if category:
         listings = listings.filter(category=category)
-        
-    return render(request, 'listings/home.html', {'listings': listings})
+
+    # Filter by guest capacity
+    guests = request.GET.get('guests')
+    if guests:
+        try:
+            listings = listings.filter(max_guests__gte=int(guests))
+        except ValueError:
+            pass
+
+    # Sorting
+    sort_by = request.GET.get('sort', 'recommended')
+    if sort_by == 'price_low':
+        listings = listings.order_by('price_per_night')
+    elif sort_by == 'price_high':
+        listings = listings.order_by('-price_per_night')
+    else:
+        listings = listings.order_by('-id') # Default to newest
+
+    context = {
+        'listings': listings,
+    }
+    return render(request, 'listings/home.html', context)
 
 def listing_detail(request, id):
     listing = get_object_or_404(Listing, id=id)
-    # Format room_type for display
-    room_type_display = listing.room_type.replace('_', ' ').title()
-    # Format host name for display
-    host_display_name = listing.host.username.title()
-    # Format dates for display
-    available_from_display = listing.available_from.strftime("%B %d, %Y") if listing.available_from else None
-    available_until_display = listing.available_until.strftime("%B %d, %Y") if listing.available_until else None
-    return render(request, 'listings/listing_detail.html', {
-        'listing': listing,
-        'room_type_display': room_type_display,
-        'host_display_name': host_display_name,
-        'available_from_display': available_from_display,
-        'available_until_display': available_until_display
-    })
-
-def become_host(request):
-    return render(request, 'listings/become_host.html')
+    return render(request, 'listings/listing_detail.html', {'listing': listing})
 
 @login_required
+def become_host(request):
+    if request.user.is_host:
+        return redirect('my_listings')
+
+    # Strict Role Enforcement: Guests cannot become hosts
+    messages.error(request, "Guests cannot become hosts. Please create a Host account.")
+    return redirect('home')
+
+@login_required
+@host_required
 def create_listing(request):
     if request.method == 'POST':
         form = ListingForm(request.POST, request.FILES)
@@ -59,59 +82,92 @@ def create_listing(request):
             listing = form.save(commit=False)
             listing.host = request.user
             listing.save()
-            messages.success(request, f'Your listing "{listing.title}" has been created successfully!')
-            return redirect('home')
+            messages.success(request, 'Listing created successfully!')
+            return redirect('my_listings')
     else:
         form = ListingForm()
-    
     return render(request, 'listings/create_listing.html', {'form': form})
 
 def signup_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        
-        # Check if user already exists
-        if User.objects.filter(email=email).exists():
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'error': 'Email already registered.'}, status=400)
-            messages.error(request, 'Email already registered.')
-            return redirect('home')
-        
-        # Create user
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
-        
-        # Log the user in
-        login(request, user)
-        
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'success': True})
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
             
-        messages.success(request, f'Welcome to HomeStay, {username}!')
-        return redirect('home')
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+                
+            messages.success(request, f'Welcome to HomeStay, {user.username}!')
+            return redirect('home')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                # Serialize errors for frontend handling
+                errors = {}
+                for field in form:
+                    if field.errors:
+                        errors[field.name] = [str(e) for e in field.errors]
+                if form.non_field_errors():
+                    errors['non_field_errors'] = [str(e) for e in form.non_field_errors()]
+                
+                return JsonResponse({'success': False, 'errors': errors}, status=400)
+            
+            # Fallback for non-AJAX requests (if any)
+            pass 
+    else:
+        form = SignUpForm()
     
-    return redirect('home')
+    return render(request, 'listings/signup.html', {'form': form})
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        messages.success(request, 'Thank you for your email confirmation. Now you can login your account.')
+        return redirect('home')
+    else:
+        messages.error(request, 'Activation link is invalid!')
+        return redirect('home')
 
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        next_url = request.POST.get('next') or request.GET.get('next')
         
         # Try to find user by email
         try:
             user_obj = User.objects.get(email=email)
+            
+            if not user_obj.is_active and user_obj.check_password(password):
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'error': 'Please activate your account. Check your email.'}, status=400)
+                messages.error(request, 'Please activate your account. Check your email.')
+                return redirect('home')
+
             user = authenticate(request, username=user_obj.username, password=password)
             
             if user is not None:
                 login(request, user)
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    return JsonResponse({'success': True})
+                    response_data = {'success': True}
+                    if next_url:
+                        response_data['redirect_url'] = next_url
+                    elif user.is_superuser:
+                        response_data['redirect_url'] = reverse('custom_admin:dashboard')
+                    return JsonResponse(response_data)
+                
                 messages.success(request, f'Welcome back, {user.username}!')
+                if next_url:
+                    return redirect(next_url)
+                if user.is_superuser:
+                    return redirect('custom_admin:dashboard')
                 return redirect('home')
             else:
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -132,11 +188,13 @@ def logout_view(request):
     return redirect('home')
 
 @login_required
+@host_required
 def my_listings(request):
     listings = Listing.objects.filter(host=request.user).order_by('-id')
     return render(request, 'listings/my_listings.html', {'listings': listings})
 
 @login_required
+@host_required
 def edit_listing(request, id):
     listing = get_object_or_404(Listing, id=id, host=request.user)
     
@@ -152,6 +210,7 @@ def edit_listing(request, id):
     return render(request, 'listings/edit_listing.html', {'form': form, 'listing': listing})
 
 @login_required
+@host_required
 def delete_listing(request, id):
     listing = get_object_or_404(Listing, id=id, host=request.user)
     
@@ -170,6 +229,11 @@ def checkout(request, listing_id):
     # Prevent users from booking their own listings
     if request.user == listing.host:
         messages.error(request, 'You cannot book your own listing.')
+        return redirect('listing_detail', id=listing_id)
+        
+    # Prevent Hosts from booking entirely
+    if request.user.is_host:
+        messages.error(request, 'Hosts cannot make bookings. Please use a guest account.')
         return redirect('listing_detail', id=listing_id)
     
     if request.method == 'POST':
@@ -254,6 +318,10 @@ def my_bookings(request):
 @login_required
 def create_checkout_session(request):
     if request.method == 'POST':
+        # Prevent Hosts from booking
+        if request.user.is_host:
+            return JsonResponse({'error': 'Hosts cannot make bookings.'}, status=403)
+
         booking_details = request.session.get('booking_details')
         if not booking_details:
             return JsonResponse({'error': 'No booking details found'}, status=400)
@@ -293,6 +361,10 @@ def create_checkout_session(request):
 @csrf_exempt
 def process_jazzcash_payment(request):
     if request.method == 'POST':
+        # Prevent Hosts from booking
+        if request.user.is_host:
+            return JsonResponse({'error': 'Hosts cannot make bookings.'}, status=403)
+
         data = json.loads(request.body)
         booking_details = request.session.get('booking_details')
         

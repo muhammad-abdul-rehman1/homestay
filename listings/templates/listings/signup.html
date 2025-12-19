@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Up - HomeStay{% endblock %}
+
+{% block content %}
+<!-- Fixed Full-Screen Container to Mimic Modal Overlay -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center">
+
+    <!-- Background Image with Dark Overlay -->
+    <div class="absolute inset-0 bg-gray-900">
+        <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+            class="w-full h-full object-cover opacity-50" alt="Background">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    </div>
+
+    <!-- Card Container -->
+    <div class="relative max-w-md w-full bg-white rounded-2xl p-8 shadow-2xl mx-4 transform transition-all">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Create an account</h2>
+            <a href="{% url 'home' %}" class="text-gray-400 hover:text-gray-600 transition">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </a>
+        </div>
+
+        {% if form.errors %}
+        <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-6 relative" role="alert">
+            <strong class="font-bold block mb-1"><i class="fa-solid fa-exclamation-circle mr-2"></i>Please correct the
+                errors below:</strong>
+            <span class="block text-sm">
+                {% for field in form %}
+                {% for error in field.errors %}
+                <div class="ml-6">• {{ error }}</div>
+                {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <div class="ml-6">• {{ error }}</div>
+                {% endfor %}
+            </span>
+        </div>
+        {% endif %}
+
+        <form class="space-y-4" action="{% url 'signup' %}" method="POST">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div>
+                <!-- Label hidden visually but present for screen readers -->
+                <label for="{{ field.id_for_label }}" class="sr-only">
+                    {% if field.name == 'username' %}Full Name{% elif field.name == 'email' %}Email{% elif field.name ==
+                    'password' %}Password{% elif field.name == 'confirm_password' %}Confirm Password{% else %}{{
+                    field.label }}{% endif %}
+                </label>
+
+                <input id="{{ field.id_for_label }}" name="{{ field.name }}" type="{{ field.field.widget.input_type }}"
+                    {% if field.field.required %}required{% endif %}
+                    class="{% if field.name == 'is_host' %}w-5 h-5 text-brand-primary border-gray-300 rounded focus:ring-brand-primary{% else %}w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition{% endif %} {% if field.errors %}border-red-300 focus:border-red-500 focus:ring-red-500{% endif %}"
+                    placeholder="{% if field.name == 'username' %}Full Name{% elif field.name == 'email' %}Email{% elif field.name == 'password' %}Password{% elif field.name == 'confirm_password' %}Confirm Password{% else %}{{ field.label }}{% endif %}"
+                    value="{{ field.value|default:'' }}">
+
+                {% if field.name == 'is_host' %}
+                <label for="{{ field.id_for_label }}" class="ml-2 text-sm text-gray-700">{{ field.label }}</label>
+                {% endif %}
+
+                {% if field.errors %}
+                {% for error in field.errors %}
+                <p class="text-red-500 text-xs italic mt-1 ml-1 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}
+                </p>
+                {% endfor %}
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit"
+                class="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold py-3 rounded-xl hover:opacity-90 transition shadow-lg shadow-brand-primary/30 mt-2">
+                Sign up
+            </button>
+        </form>
+
+        <p class="text-center mt-6 text-sm text-gray-600">
+            Already have an account?
+            <a href="{% url 'login' %}" class="text-brand-primary font-bold hover:underline">
+                Log in
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}

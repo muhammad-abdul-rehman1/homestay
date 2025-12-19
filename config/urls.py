@@ -20,7 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('test-admin/', admin.site.urls), # Renamed default admin to avoid conflict if needed, or keep as is
+    path('admin-panel/', include('custom_admin.urls')),
     path('', include('listings.urls')),
 ]
 

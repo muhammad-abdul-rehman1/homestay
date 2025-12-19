@@ -1,0 +1,75 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Bookings</h1>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-semibold">
+                    <th class="px-6 py-4">Listing</th>
+                    <th class="px-6 py-4">Guest</th>
+                    <th class="px-6 py-4">Check-in / Out</th>
+                    <th class="px-6 py-4">Price</th>
+                    <th class="px-6 py-4">Payment</th>
+                    <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for booking in bookings %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">
+                        <a href="{% url 'listing_detail' booking.listing.id %}" target="_blank"
+                            class="font-medium text-gray-900 hover:text-brand-primary transition">
+                            {{ booking.listing.title|truncatechars:30 }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm">
+                            <p class="font-medium text-gray-900">{{ booking.guest.username }}</p>
+                            <p class="text-gray-500">{{ booking.guest.email }}</p>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        <div class="flex flex-col">
+                            <span>In: {{ booking.check_in|date:"M d, Y" }}</span>
+                            <span>Out: {{ booking.check_out|date:"M d, Y" }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                        ${{ booking.total_price }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if booking.is_paid %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Paid</span>
+                        {% else %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <form action="{% url 'custom_admin:booking_cancel' booking.pk %}" method="POST"
+                            onsubmit="return confirm('Start cancellation for this booking?');">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition"
+                                title="Cancel Booking">
+                                <i class="fa-solid fa-ban"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">No bookings found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

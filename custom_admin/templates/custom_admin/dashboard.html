@@ -1,0 +1,157 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+    <p class="text-gray-500 mt-2">Overview of platform performance and key metrics.</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-8">
+    <!-- Users -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="bg-blue-50 text-blue-600 p-4 rounded-xl text-2xl">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm font-medium">Total Users</p>
+            <p class="text-2xl font-bold text-gray-900">{{ total_users }}</p>
+        </div>
+    </div>
+
+    <!-- Hosts -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="bg-indigo-50 text-indigo-600 p-4 rounded-xl text-2xl">
+            <i class="fa-solid fa-house-user"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm font-medium">Hosts</p>
+            <p class="text-2xl font-bold text-gray-900">{{ total_hosts }}</p>
+        </div>
+    </div>
+
+    <!-- Guests -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="bg-purple-50 text-purple-600 p-4 rounded-xl text-2xl">
+            <i class="fa-solid fa-suitcase"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm font-medium">Guests</p>
+            <p class="text-2xl font-bold text-gray-900">{{ total_guests }}</p>
+        </div>
+    </div>
+
+    <!-- Listings -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="bg-orange-50 text-orange-600 p-4 rounded-xl text-2xl">
+            <i class="fa-solid fa-home"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm font-medium">Total Listings</p>
+            <p class="text-2xl font-bold text-gray-900">{{ total_listings }}</p>
+        </div>
+    </div>
+
+    <!-- Bookings -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="bg-teal-50 text-teal-600 p-4 rounded-xl text-2xl">
+            <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm font-medium">Total Bookings</p>
+            <p class="text-2xl font-bold text-gray-900">{{ total_bookings }}</p>
+        </div>
+    </div>
+
+    <!-- Revenue -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="bg-green-50 text-green-600 p-4 rounded-xl text-2xl">
+            <i class="fa-solid fa-dollar-sign"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm font-medium">Total Revenue</p>
+            <p class="text-2xl font-bold text-gray-900">${{ total_revenue|floatformat:2 }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Recent Listings -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+            <h2 class="text-lg font-bold text-gray-900">Recent Listings</h2>
+            <a href="{% url 'custom_admin:listing_list' %}"
+                class="text-brand-primary text-sm font-medium hover:underline">View All</a>
+        </div>
+        <div class="divide-y divide-gray-100">
+            {% for listing in recent_listings %}
+            <div class="p-4 flex items-center gap-4 hover:bg-gray-50 transition">
+                <div class="w-12 h-12 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0">
+                    {% if listing.image %}
+                    <img src="{{ listing.image.url }}" alt="{{ listing.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full bg-gray-300 flex items-center justify-center text-gray-500"><i
+                            class="fa-solid fa-image"></i></div>
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-medium text-gray-900 truncate">{{ listing.title }}</p>
+                    <p class="text-xs text-gray-500">by {{ listing.host.username }} • {{ listing.created_at|date:"M d,
+                        Y" }}</p>
+                </div>
+                <div>
+                    {% if listing.status == 'approved' %}
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Approved</span>
+                    {% elif listing.status == 'rejected' %}
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Rejected</span>
+                    {% else %}
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-8 text-center text-gray-500">No recent listings.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+            <h2 class="text-lg font-bold text-gray-900">Recent Bookings</h2>
+            <a href="{% url 'custom_admin:booking_list' %}"
+                class="text-brand-primary text-sm font-medium hover:underline">View All</a>
+        </div>
+        <div class="divide-y divide-gray-100">
+            {% for booking in recent_bookings %}
+            <div class="p-4 flex items-center gap-4 hover:bg-gray-50 transition">
+                <div
+                    class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-medium text-gray-900">{{ booking.guest.username }} booked {{
+                        booking.listing.title }}</p>
+                    <p class="text-xs text-gray-500">{{ booking.created_at|date:"M d, Y" }} • ${{ booking.total_price }}
+                    </p>
+                </div>
+                <div>
+                    {% if booking.is_paid %}
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Paid</span>
+                    {% else %}
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Pending</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-8 text-center text-gray-500">No recent bookings.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

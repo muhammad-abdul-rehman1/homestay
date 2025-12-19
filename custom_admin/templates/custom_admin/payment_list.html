@@ -1,0 +1,56 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Payments</h1>
+    <p class="text-gray-500 text-sm">Valid completed transactions (Read-Only).</p>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-semibold">
+                    <th class="px-6 py-4">Transaction ID</th>
+                    <th class="px-6 py-4">Date</th>
+                    <th class="px-6 py-4">Guest</th>
+                    <th class="px-6 py-4">Amount</th>
+                    <th class="px-6 py-4">Method</th>
+                    <th class="px-6 py-4">Booking Ref</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for booking in payments %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-mono text-xs text-gray-500">
+                        {{ booking.payment_id|default:"N/A" }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        {{ booking.created_at|date:"M d, Y H:i" }}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm">
+                            <p class="font-medium text-gray-900">{{ booking.guest.username }}</p>
+                            <p class="text-gray-500">{{ booking.guest.email }}</p>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-bold text-green-600">
+                        ${{ booking.total_price }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-700 capitalize">
+                        {{ booking.payment_method|default:"Unknown" }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        #{{ booking.id }} ({{ booking.listing.title|truncatechars:20 }})
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">No completed payments found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

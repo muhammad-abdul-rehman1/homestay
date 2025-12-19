@@ -1,0 +1,122 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Users</h1>
+    <div class="flex gap-2">
+        <a href="?role=admin"
+            class="px-4 py-2 rounded-lg text-sm font-medium {% if request.GET.role == 'admin' %}bg-brand-primary text-white{% else %}bg-white text-gray-600 border border-gray-200 hover:bg-gray-50{% endif %}">Admins</a>
+        <a href="?role=host"
+            class="px-4 py-2 rounded-lg text-sm font-medium {% if request.GET.role == 'host' %}bg-brand-primary text-white{% else %}bg-white text-gray-600 border border-gray-200 hover:bg-gray-50{% endif %}">Hosts</a>
+        <a href="?role=guest"
+            class="px-4 py-2 rounded-lg text-sm font-medium {% if request.GET.role == 'guest' %}bg-brand-primary text-white{% else %}bg-white text-gray-600 border border-gray-200 hover:bg-gray-50{% endif %}">Guests</a>
+        <a href="{% url 'custom_admin:user_list' %}"
+            class="px-4 py-2 rounded-lg text-sm font-medium bg-white text-gray-600 border border-gray-200 hover:bg-gray-50">Clear</a>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-semibold">
+                    <th class="px-6 py-4">User</th>
+                    <th class="px-6 py-4">Role</th>
+                    <th class="px-6 py-4">Joined</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for user_obj in users %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-sm">
+                                {{ user_obj.username|make_list|first|upper }}
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ user_obj.username }}</p>
+                                <p class="text-sm text-gray-500">{{ user_obj.email }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if user_obj.is_superuser %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Admin</span>
+                        {% elif user_obj.is_host %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Host</span>
+                        {% else %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Guest</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        {{ user_obj.date_joined|date:"M d, Y" }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if user_obj.is_active %}
+                        <span
+                            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Active
+                        </span>
+                        {% else %}
+                        <span
+                            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-600"></span> Inactive
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        {% if user_obj != request.user %}
+                        <div class="flex items-center justify-end gap-2">
+                            {% if user_obj.is_active %}
+                            <form action="{% url 'custom_admin:user_action' user_obj.pk 'deactivate' %}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to deactivate this user?');">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="text-orange-500 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 p-2 rounded-lg transition"
+                                    title="Deactivate">
+                                    <i class="fa-solid fa-ban"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <form action="{% url 'custom_admin:user_action' user_obj.pk 'activate' %}" method="POST"
+                                onsubmit="return confirm('Activate this user?');">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="text-green-500 hover:text-green-700 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition"
+                                    title="Activate">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            <form action="{% url 'custom_admin:user_action' user_obj.pk 'delete' %}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to DELETE this user? This action cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition"
+                                    title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">No users found matching your criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Pagination could go here -->
+</div>
+{% endblock %}

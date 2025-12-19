@@ -43,19 +43,22 @@
         <form method="GET" action="." class="flex items-center gap-2">
             <!-- Preserve existing search params -->
             {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
-            {% if request.GET.check_in %}<input type="hidden" name="check_in" value="{{ request.GET.check_in }}">{% endif %}
-            {% if request.GET.check_out %}<input type="hidden" name="check_out" value="{{ request.GET.check_out }}">{% endif %}
+            {% if request.GET.check_in %}<input type="hidden" name="check_in" value="{{ request.GET.check_in }}">{%
+            endif %}
+            {% if request.GET.check_out %}<input type="hidden" name="check_out" value="{{ request.GET.check_out }}">{%
+            endif %}
             {% if request.GET.guests %}<input type="hidden" name="guests" value="{{ request.GET.guests }}">{% endif %}
-            {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+            {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{%
+            endif %}
 
             <label for="sort" class="text-sm text-gray-600">Sort by</label>
             <select name="sort" id="sort" onchange="this.form.submit()"
                 class="border-gray-300 rounded-lg text-sm focus:ring-black focus:border-black py-2 pl-3 pr-8 shadow-sm cursor-pointer">
-                <option value="recommended" {% if request.GET.sort == 'recommended' %}selected{% endif %}>Recommended
+                <option value="recommended" {% if request.GET.sort=='recommended' %}selected{% endif %}>Recommended
                 </option>
-                <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High
+                <option value="price_low" {% if request.GET.sort=='price_low' %}selected{% endif %}>Price: Low to High
                 </option>
-                <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low
+                <option value="price_high" {% if request.GET.sort=='price_high' %}selected{% endif %}>Price: High to Low
                 </option>
             </select>
         </form>

@@ -14,6 +14,7 @@ class Listing(models.Model):
     host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listings')
     title = models.CharField(max_length=255)
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
+    max_guests = models.IntegerField(default=1)
     room_type = models.CharField(max_length=20, choices=ROOM_TYPE_CHOICES)
     country = models.CharField(max_length=100)
     city = models.CharField(max_length=100, blank=True, null=True)
@@ -23,6 +24,14 @@ class Listing(models.Model):
     available_from = models.DateField(null=True, blank=True)
     available_until = models.DateField(null=True, blank=True)
     amenities = models.JSONField(default=dict)
+    
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
@@ -54,6 +63,7 @@ class Booking(models.Model):
     check_out = models.DateField()
     num_guests = models.IntegerField(default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
     
     # Payment fields
     PAYMENT_METHOD_CHOICES = (

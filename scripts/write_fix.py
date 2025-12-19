@@ -1,4 +1,7 @@
-{% extends 'base.html' %}
+
+import os
+
+content = """{% extends 'base.html' %}
 
 {% block content %}
 <!-- Category Filter -->
@@ -111,3 +114,13 @@
     </div>
 </main>
 {% endblock %}
+"""
+
+# Hardcore check for spaces just in case
+if "sort == 'recommended'" not in content:
+    print("FATAL: Content check failed before write!")
+else:
+    path = os.path.join(os.getcwd(), 'listings', 'templates', 'listings', 'home_final.html')
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f"Successfully wrote to {path}")
