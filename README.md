@@ -11,6 +11,27 @@ HomeStay is a comprehensive vacation rental platform built with Django. It allow
 - **Host Dashboard**: Manage listings and view incoming bookings.
 - **Reviews & Ratings**: Leave feedback on stays.
 
+## User Roles
+HomeStay supports three types of users:
+
+1. **Admin/Superuser**
+   - Access to admin dashboard at `/admin-panel/`
+   - Manage all users, listings, bookings, and payments
+   - Approve or reject property listings
+   - View platform statistics and revenue
+
+2. **Host**
+   - Create and manage property listings
+   - Set availability and pricing
+   - View incoming bookings
+   - Users can become hosts by creating a listing
+
+3. **Guest**
+   - Browse and search properties
+   - Make bookings and payments
+   - Leave reviews
+   - Default role for new signups
+
 ## Prerequisites
 - Python 3.8+
 - pip (Python package manager)
@@ -61,6 +82,24 @@ HomeStay is a comprehensive vacation rental platform built with Django. It allow
 
 2.  Open your browser and navigate to:
     `http://127.0.0.1:8000/`
+
+## Admin Dashboard Access
+
+To access the admin dashboard:
+
+1.  **Create a superuser** (if not done already):
+    ```bash
+    python manage.py createsuperuser
+    ```
+    Follow the prompts to set username, email, and password.
+
+2.  **Login and access**:
+    - Regular Django admin: `http://127.0.0.1:8000/admin/`
+    - Custom admin dashboard: `http://127.0.0.1:8000/admin-panel/`
+
+3.  **Existing users** (if database is included):
+    - Check if your `db.sqlite3` already has a superuser account
+    - Try common credentials: `admin` / `admin123` (if pre-configured)
 
 ## Project Structure
 - `config/`: Main project configuration (settings, urls).
