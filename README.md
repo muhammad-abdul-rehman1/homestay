@@ -101,6 +101,27 @@ To access the admin dashboard:
     - Check if your `db.sqlite3` already has a superuser account
     - Try common credentials: `admin` / `admin123` (if pre-configured)
 
+## Using the Platform
+
+### As a Guest (Default)
+1. **Sign up** on the homepage
+2. **Browse listings** on the home page or use search/filters
+3. **Select a property** and click on it to view details
+4. **Book a stay**:
+   - Choose check-in and check-out dates
+   - Select number of guests
+   - Proceed to payment (Stripe or JazzCash)
+5. **Leave a review** after your stay
+
+### Becoming a Host
+1. **Log in** to your account (or sign up if you don't have one)
+2. **Create a listing**:
+   - Navigate to "Create Listing" (usually in user menu/profile)
+   - Fill in property details (title, price, location, amenities, images)
+   - Submit for admin approval
+3. **Wait for approval**: Admins review listings before they go live
+4. **Manage bookings**: View and manage incoming reservations once approved
+
 ## Project Structure
 - `config/`: Main project configuration (settings, urls).
 - `core/`: Core functionality and base templates.
