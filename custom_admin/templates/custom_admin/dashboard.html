@@ -8,7 +8,6 @@
 
 <!-- Stats Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-8">
-    <!-- Users -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
         <div class="bg-blue-50 text-blue-600 p-4 rounded-xl text-2xl">
             <i class="fa-solid fa-users"></i>
@@ -19,7 +18,6 @@
         </div>
     </div>
 
-    <!-- Hosts -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
         <div class="bg-indigo-50 text-indigo-600 p-4 rounded-xl text-2xl">
             <i class="fa-solid fa-house-user"></i>
@@ -30,7 +28,6 @@
         </div>
     </div>
 
-    <!-- Guests -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
         <div class="bg-purple-50 text-purple-600 p-4 rounded-xl text-2xl">
             <i class="fa-solid fa-suitcase"></i>
@@ -41,7 +38,6 @@
         </div>
     </div>
 
-    <!-- Listings -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
         <div class="bg-orange-50 text-orange-600 p-4 rounded-xl text-2xl">
             <i class="fa-solid fa-home"></i>
@@ -52,7 +48,6 @@
         </div>
     </div>
 
-    <!-- Bookings -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
         <div class="bg-teal-50 text-teal-600 p-4 rounded-xl text-2xl">
             <i class="fa-solid fa-calendar-check"></i>
@@ -63,7 +58,6 @@
         </div>
     </div>
 
-    <!-- Revenue -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
         <div class="bg-green-50 text-green-600 p-4 rounded-xl text-2xl">
             <i class="fa-solid fa-dollar-sign"></i>
@@ -76,7 +70,6 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <!-- Recent Listings -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="p-6 border-b border-gray-100 flex justify-between items-center">
             <h2 class="text-lg font-bold text-gray-900">Recent Listings</h2>
@@ -97,7 +90,7 @@
                 <div class="flex-1 min-w-0">
                     <p class="font-medium text-gray-900 truncate">{{ listing.title }}</p>
                     <p class="text-xs text-gray-500">by {{ listing.host.username }} • {{ listing.created_at|date:"M d,
-                        Y" }}<!-- fixed --></p>
+                        Y" }}</p>
                 </div>
                 <div>
                     {% if listing.status == 'approved' %}
@@ -118,7 +111,6 @@
         </div>
     </div>
 
-    <!-- Recent Bookings -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="p-6 border-b border-gray-100 flex justify-between items-center">
             <h2 class="text-lg font-bold text-gray-900">Recent Bookings</h2>
