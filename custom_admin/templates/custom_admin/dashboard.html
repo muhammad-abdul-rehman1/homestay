@@ -97,7 +97,7 @@
                 <div class="flex-1 min-w-0">
                     <p class="font-medium text-gray-900 truncate">{{ listing.title }}</p>
                     <p class="text-xs text-gray-500">by {{ listing.host.username }} • {{ listing.created_at|date:"M d,
-                        Y" }}</p>
+                        Y" }}<!-- fixed --></p>
                 </div>
                 <div>
                     {% if listing.status == 'approved' %}
